@@ -2,7 +2,7 @@
 
 > Kotlin In Action을 읽고 더욱 Dynamic하게 기록합니다.
 
-<img src ="https://velog.velcdn.com/images/youngerjesus/post/ba30d109-ffe7-4f3f-ac49-1878a88b2a47/kotlin.jpeg" width = 50px height = 50px></img>
+<img src ="https://velog.velcdn.com/images/youngerjesus/post/ba30d109-ffe7-4f3f-ac49-1878a88b2a47/kotlin.jpeg" width = 200px height = 200px></img>
 
 ## 타임라인
 
