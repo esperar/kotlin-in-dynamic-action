@@ -3,7 +3,7 @@
 
 > Kotlin In Action을 읽고 더욱 Dynamic하게 기록합니다.
 
-<img src ="https://velog.velcdn.com/images/haero_kim/post/212f9167-e32d-41f1-be80-0e6bc12c6cf8/general.png" width = 400px height = 200px></img>
+<img src ="https://velog.velcdn.com/images/haero_kim/post/212f9167-e32d-41f1-be80-0e6bc12c6cf8/general.png" width = 700px height = 350px></img>
 
 ## 타임라인
 
@@ -49,3 +49,8 @@
 - **불변성**: 일단 만들어지고 나면 내부 상태가 절대로 바뀌지 않는 불변 객체를 사용해 프로그램을 작성한다.
 - **부수 효과 없음**: 입력이 같으면 항상 같은 출력을 내놓고 다른 객체의 상태를 변경하지 않으며, 함수 외부나 다른 바깥 환경과 상호작용하지 않는 순수 함수를 사용한다.
 
+
+<br>
+
+### Ref
+[Kotlin In Action](https://www.yes24.com/Product/Goods/55148593)
