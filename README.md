@@ -2,6 +2,8 @@
 
 > Kotlin In Action을 읽고 더욱 Dynamic하게 기록합니다.
 
+![](https://velog.velcdn.com/images/youngerjesus/post/ba30d109-ffe7-4f3f-ac49-1878a88b2a47/kotlin.jpeg)
+
 ## 타임라인
 
 1. [코틀린 기초]()
