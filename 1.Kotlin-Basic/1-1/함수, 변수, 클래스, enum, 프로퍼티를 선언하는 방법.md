@@ -161,3 +161,299 @@ fun main(args: Array<String>) {
     println("Hello, ${args[0]}!")
 }
 ```
+
+<br>
+
+## 클래스와 프로퍼티
+
+시작하기 위해 간단한 자바빈 클래스인 Person을 정의하자
+
+```java
+public class Person {
+
+    private final String name;
+
+    public Person(String name ){
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+}
+```
+
+필드가 둘 이상으로 늘어나면 생성자인 Person의 본문에서 파라미터 이름이 같은 필드에 대입하는 대입문의 수도 늘어난다.
+  
+코틀린에서는 그런 필드 대입 로직을 훨씬 더 적은 코드로 작성할 수 있다.
+
+```kt
+class Person(val name: String)
+```
+
+멋지다. 다른 최신 JVM 언어에서 이와 비슷한 클래스 정의를 이미 본 독자도 있을 것이다.
+  
+이런 유형의 클래스를 값 객체라 부르며 다양한 언어가 값 객체를 간결하게 기술할 수 있는 구문을 제공한다.
+  
+> public 가시성 변경자가 사라졌음을 확인하라. 코틀린의 기본 가시성 public이므로 이런 경우 변경자를 생략해도 된다.
+
+<br>
+
+### 프로퍼티
+
+클래스라는 개념의 목적은 데이터를 캡슐화하고 캡슐화한 데이터를 다루는 코드를 한 주체 아래 가두는 것이다.
+  
+자바에서는 데이터를 필드에 저장하며, 멤버 필드의 가시성을 보통 비공개다.
+  
+클래스는 자신을 사용하는 클라이언트가 그 데이터를 읽기 위한 게터를 제공하고 필드를 변경하게 허용해야할 경우 세터를 추가 제공할 수도 있다.
+  
+이런 예를 Person 클래스에서도 볼 수 있다.
+  
+세터는 자신이 받은 값을 검증하거나 필드 변경을 다른 곳에 통지하는 등의 로직을 더 가질 수 있다.
+  
+자바에서는 필드와 접근자를 한데 묶어 프로퍼티라고 부르며 프로퍼티라는 개념을 활용하는 프레임워크가 많다.
+  
+코틀린은 프로퍼티 언어 기비본 기능을 제공하며, 코틀린 프로퍼티는 자바의 필드와 접근자 메서드를 완전히 대신한다.
+  
+클래스에서 프로퍼티를 선언할 때는 앞에서 살펴본 변수를 선언하는 방법과 마찬가지로 var, var를 사용한다.
+
+```kt
+class Person(
+    val name: String, // 읽기 전용 프로퍼티로 코틀린은 (비공개) 필드와 필드를 읽는 단순한 (공개) 게터를 만들어낸다.
+    var isMarried: Boolean // 쓸 수 잇는 프로퍼티로, 코틀린은 (비공개) 필드, (공개) 게터, (공개) 세터를 만들어낸다.
+)
+```
+
+기본적으로 코틀린에서 프로퍼티를 선언하는 방식은 프로퍼티와 관련 잇는 접근자를 선언하는 것이다.
+  
+코틀린은 값을 저장하기 위한 비공개 필드와 그 필드에 값을 저장하기 위한 세터, 필드의 값을 읽기 위한 게터로 이뤄진 간단한 디폴트 접근자 구현을 제공한다.
+
+```kt
+val person = Person("Bob", true)
+println(person.name) // Bob
+```
+
+위에서 알 수 있듯 코틀린에서 객체를 생성할때는 new 키워드를 사용하지 않아도 되며 프로퍼티 이름을 직접 사용해도 코틀린이 자동으로 게터를 호출해준다.
+
+> 자바에서 선언한 클래스에 대해 코틀린 문법을 사용해도 된다.  
+> 코틀린에서는 자바 클래스의 게터를 val 프로퍼티처럼 사용할 수 있고, 게터/세터 쌍이 있는 경우에는 var 프로퍼티처럼 사용할 수 있다.  
+
+대부분의 프로퍼티에는 그 프로퍼티의 값을 저장하기 위한 필드가 있다. 이를 ㅍ ㅡ로퍼티를 뒷받침하는 필드라고 부른다.
+  
+하지만 원한다면 프로퍼티 값을 그때그때 계산할 수도 있다.
+  
+커스텀 게터를 작성하면 그런 프로퍼티를 만들 수 있다.
+
+<br>
+
+### 커스텀 접근자
+
+직사각형 클래스 Rectangle을 정의하면서 자신이 정사각형인지 알려주는 기능을 만들어보자.
+  
+직사각형이 정사각형인지를 별도의 필드에 저장할 필요 없다.
+  
+사각형의 너비와 높이가 같은지 검사하면 정사각형의 여부를 그때그때 알 수 있다.
+
+```kt
+class Rectangle(val height: Int, val width: Int) {
+    val isSquare: Boolean
+        get() {
+            return height == width
+        }
+}
+```
+
+isSqaure에 자체 값을 저장하는 필드가 필요 없고, 이 프로퍼티에는 자체 구현을 제공하는 게터만 존재한다.
+  
+클라이언트가 프로퍼티에 접근할 때마다 게터가 프로퍼티의 값을 매번 다시 계산한다.
+
+```kt
+val rectangle = Rectangle(41, 43)
+println(rectangle.isSquare) // false
+```
+
+커스텀 게터를 사용하는 방법과 필드를 추가해서 관리하는 방법중에 성능상에 차이는 딱히 없다 가독성의 측면에서만 차이가 난다.
+
+<br>
+
+### 코틀린 소스코드 구조: 디렉터리와 패키지
+
+코틀린에서도 package라는 단위로 소스코드를 구성한다.
+  
+다른 패키지에서 클래스를 불러오려면 임포트문은 파일의 맨 앞에 와야 하며 import 키워드를 사용해야한다.
+
+```kt
+package geometry.shapes
+
+import java.util.Random
+
+class Rectangle(val width: Int, val width: Int) {
+    val isSquare: Boolean
+        get() = height == width
+}
+
+```
+
+코틀린에서 클래스 임포트와 함수 임포트에 차이가 없으며, 모든 선언을 import 키워드로 가져올 수 있다.
+  
+최상위 함수는 그 이름을 써서 임포트할 수 있다.
+
+```kt
+package geometry.example
+
+import geometry.shapes.createRandomRectangle
+
+fun main(args: Array<String>) {
+    println(createRandomRectangle().isSquare)
+}
+
+```
+
+패키지 이름 뒤에 .*를 추가하면 패키지 안에 모든 선언을 임포트할 수 있다.
+  
+스타(*) 임포트를 사용하면 패키지 안에 모든 클래스 뿐만 아니라 최상위에 정의된 함수나 프로퍼티까지 모두 불러온다는 점을 유의하자.
+  
+<br>
+
+## 선택 표현과 처리: enum과 when
+
+### enum 클래스의 정의
+
+enum 클래스를 사용해서 다채로운 색을 추가해보자.
+
+```kt
+enum class Color {
+    RED, ORANGE, YELLOW, GREEN, BLUE, INDIGO, VIOLET
+}
+```
+
+enum은 자바 선언보다 코틀린 선언에 더 많은 키워드를 써야하는 흔치 않은 예다,
+  
+코틀린에서는 enum class를 사용하지만 자바에서는 enum을 사용한다.
+  
+코틀린에서 enum 키워드는 `소프트 키워드`라고 부르는 존재다.
+  
+enum은 class 앞에 있을 때는 특별한 의미를 지니지만 다른 곳에서는 이름에 사용할 수 있다. 반면 class는 키워드다.
+  
+따라서 class라는 이름을 사용할 수 없으므로 클래스를 표현하는 변수 등을 정의할 때는 clazz나 aClass와 같은 이름으로 사용해야한다.
+  
+자바와 마찬가지로 enum 안에서 값만 열거하는 것이 아닌 프로퍼티와 메서드를 정의할 수 있다.
+
+```kt
+enum class Color(
+    val r: Int, val g: Int, val b: Int
+) {
+    RED(255, 0, 0), ORANGE(255, 165, 0),
+    YELLOW(255,255,0);
+
+    fun rgb() = (r * 256 + g) * 256 + b
+
+}
+
+fun main() {
+    println(Color.BLUE.rgb()) // 255
+}
+```
+
+enum에서도 일반적인 클래스와 마찬가지로 생성자와 프로퍼티를 선언한다.
+  
+각 enum 상수를 정의할 때는 그 상수에 해당하는 프로퍼티 값을 지정해야만 한다.
+  
+이 예제에서는 코틀린에서 유일하게 세미콜론이 필수인 부분을 볼 수 있다.
+  
+enum은 클래스 안에 메서드를 정의하는 경우 반드시 enum 상수 목록과 메서드 정의 사이에 세미콜론을 붙여야한다.
+
+<br>
+
+### when으로 enum 클래스 다루기
+
+무지개의 색을 기억하기 위해 연상법을 적용한 문장을 외우는 아이를 본 적이 있을 것이다.
+  
+그런 문장의 예로는 "Richard Of York Gave Battle In Vain!"을 들 수 있다,
+  
+무지개의 각 색에 대해 그와 상응하는 연상 단어를 짝지어주는 함수가 필요하다고 상상해보자.
+  
+자바라면 switch를 사용해서 그런 함수를 작성할 수 있다.
+  
+switch에 해당하는 코틀린 구성 요소는 when이다.
+  
+if와 마찬가지로 when도 값을 만들어내는 식(expression)이다.
+
+```kt
+
+fun getMnemonic(color: Color) =
+    when(color) {
+        Color.RED -> "Richard"
+        Color.ORANGE -> "Of"
+        Color.YELLOW -> "York"
+        Color.GREEN -> "Gave"
+        Color.BLUE -> "Battle"
+        Color.INDIGO -> "In"
+        Color.VIOLET -> "Vain"
+    }
+
+fun main() {
+    println(getMnemonic(Color.BLUE))
+}
+```
+
+앞의 코드는 color로 전달된 값과 같은 분기를 찾는다.
+  
+자바와 달리 각 분기의 끝에 break를 넣지 않아도 된다.
+  
+성공적으로 매치되는 분기를 찾으면 switch는 그 분기를 실행한다. 
+  
+한 분기 안에서 여러 값을 매치 패턴으로 사용할 수도 있다. 그럴 경우 값 사이를 콤마,로 분리한다.
+
+```kt
+
+fun getWarmth(color: Color) =
+    when(color) {
+        Color.RED, Color.ORANGE, Color.YELLOW -> "warm"
+        Color.GREEN -> "neutral"
+        Color.BLUE, Color.INDIGO, Color.VIOLET -> "cold"
+    }
+
+fun main() {
+    println(getWarmth(Color.BLUE))
+}
+```
+
+상수값을 임포트하면 더욱 간결하게 사용할 수도 있다.
+
+```kt
+import ch02.colors.Color
+import ch02.colors.Color.*
+
+fun getWarmth(color: Color) =
+    when(color) {
+        RED, ORANGE, YELLOW -> "warm"
+        GREEN -> "neutral"
+        BLUE, INDIGO, VIOLET -> "cold"
+    }
+
+```
+
+<br>
+
+### when과 임의의 객체를 함께 사용
+
+자바 switch와 달리 코틀린 when은 분기 조건은 임의의 객체를 허용한다.
+  
+두 색을 혼합했을 때 미리 정해진 팔레트에 들어있는 색이 임의의 객체를 허용한다. 두 색을 혼합했을 때 미리 정해진 팔레트에 들어있는 색이 될 수 있는지 알려주는 함수를 작성하자.
+  
+팔레트에 있는 색을 조합할 수 있는 방법이 많지 않기 때문에 모든 경우를 쉽게 열거할 수 있다.
+
+```kt
+fun mix(c1: Color, c2: Color) =
+    when(setOf(c1, c2)) {
+        setOf(RED, YELLOW) -> ORANGE
+        setOf(YELLOW, BLUE) -> GREEN
+        setOf(BLUE, VIOLET) -> INDIGO
+        else -> throw Exception("Dirty color") // 매치되는 분기 조건이 없으면 이 문장을 실행한다.
+    }
+
+fun main() {
+    println(mix(RED, YELLOW)) // ORANGE
+}
+```
