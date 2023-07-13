@@ -1,6 +1,5 @@
 # Kotlin Dynamic Action
 
-
 > Kotlin In Action을 읽고 더욱 Dynamic하게 기록합니다.
 
 <img src ="https://velog.velcdn.com/images/haero_kim/post/212f9167-e32d-41f1-be80-0e6bc12c6cf8/general.png" width = 700px height = 350px></img>
