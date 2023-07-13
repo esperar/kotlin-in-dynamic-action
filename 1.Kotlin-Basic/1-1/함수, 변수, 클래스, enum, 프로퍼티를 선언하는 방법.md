@@ -457,3 +457,48 @@ fun main() {
     println(mix(RED, YELLOW)) // ORANGE
 }
 ```
+
+setOf(c1, c2)와 조건에 있는 값과 비교를 할때 `동등성`을 사용한다.
+  
+그러므로 앞의 코드는 처음에 setOf(c1, c2)와 setOf(RED, YELLOW)를 비교하고 그 둘이 같지 않으면 계속 다음 분기의 조건 객체와 setOf(c1, c2)를 차례로 비교하는 식으로 작동한다.
+  
+모든 분기 식에서 만족하는 조건을 찾을 수 없다면 else 분기의 문장을 계산한다.
+  
+<br>
+
+### 인자 없는 when의 사용
+
+위의 예제에서 색깔의 조합을 비교할 때마다 setOf를 사용해 Set 인스턴스를 생성한다.
+  
+이는 역시 비효율적으로 이어질 수 있다.
+   
+물론 이러한 비효율성이 크게 문제가 되지 않긴하지만 이 함수가 자주 호출된다면 불필요한 가비지 객체가 늘어나기 때문에 비효율적이다.
+
+코드는 약간 읽기 어려워지만 인자가 없는 when 식을 사용해 성능을 더 향상시켜볼 수 있다.
+
+```kt
+fun mixOptimized(c1: Color, c2: Color) =
+    when {
+        (c1 == RED && c2 == YELLOW) ||
+        (c1 == YELLOW && c2 == RED) 
+        -> ORANGE
+
+        (c1 == YELLOW && c2 == BLUE) ||
+        (c1 == BLUE && c2 == YELLOW) 
+        -> GREEN
+
+        (c1 == BLUE && c2 == VIOLET) ||
+        (c1 == VIOLET && c2 == BLUE) 
+        -> INDIGO
+
+        else -> throw Exception("Dirty Color")
+    }
+
+fun main() {
+    println(mixOptimized(RED, YELLOW)) // ORANGE
+}
+```
+
+<br>
+
+### 스마트 캐스트: 타입 검사와 타입 캐스트를 조합
