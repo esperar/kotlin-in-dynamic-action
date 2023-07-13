@@ -502,3 +502,140 @@ fun main() {
 <br>
 
 ### 스마트 캐스트: 타입 검사와 타입 캐스트를 조합
+
+예제로 (1 + 2) + 4와 같은 간단한 산술식을 계산하는 함수를 만들어보자.
+  
+함수가 받을 산술식에서는 오직 두 수를 더하는 연산만 가능하다.
+  
+다른 연산도 비슷한 방식으로 구현할 수 있다.
+
+우선 식을 인코딩하는 방법을 생각해야 한다. 식을 트리 구조로 저장하자.
+  
+노드는 합계나 수중 하나다. Num은 항상 말단 노드지, Sum은 자식이 둘 잇는 중간 노드다.
+  
+Sum 노드의 두 자식은 덧셈의 두 인자다.
+  
+다음 리스트는 식을 표현하는 간단한 클래스를 보여준다.
+  
+식을 위한 Expr 인터페이스가 있고, Sum, Num 클래스는 그 Expr 인터페이스를 구현한다.
+  
+Expr은 아무런 메서드도 선언하지 않으며ㅡ 단지 여러 타입의 식 객체를 아우르는 공통 타입 역할만 수행한다.
+  
+클래스가 구현하는 인터페이스를 지정하기 위해서 콜론 뒤에 인터페이스 이름을 사용한다.
+
+```kt
+interface Expr
+class Num(val value: Int): Expr
+class Sum(val left: Expr, val right: Expr): Expr
+```
+
+Sum은 Expr의 왼쪽과 오른쪽 인자에 대한 참조를 LEFt, right 프로퍼티로 저장한다.
+  
+이 예제에서 left, right는 각각의 Num이나 Sum일 수 있다. (1 + 2) + 4라는 식을 저장하면 Sum(Sum(Num(1), Num(2)), Num(4)) 라는 구조의 객체가 생긴다.
+  
+이제 이 식의 값을 어떻게 계산하는지 살펴보자, 앞에서 살펴본 예를 평가한 값은 7이어야 한다.
+
+```kt
+println(eval(Sum(Sum(Num(1), Num(2))), Num(4))) // 7
+```
+
+Expr 인터페이스는 두 가지 구현 클래스가 존재한다. 따라서 식을 평가하려면 두 가지 경우를 고려해야한다.
+
+- 어떤 식이 수라면 그 값을 반환한다
+- 어떤 식이 합계라면 좌항과 우항의 값을 계산한 다음에 그 두 값을 합한 값을 반환한다.
+
+자바 스타일로 작성한 함수를 먼저 살펴본 다음 코틀린 스타일로 만든 함수를 살펴보자. 
+  
+자바였다면 조건을 검사하기 위해 if문을 사용했을 것이다.
+  
+따라서 코틀린에서 if를 써서 자바 스타일로 함수를 작성해보자
+
+```kt
+fun eval(e: Expr): Int {
+    if(e is Num) {
+        val n = e as Num // 불필요한 중복
+        return n.value
+    }
+
+    if(e is Sum) {
+        return eval(e.right) + eval(e.left) // e에 대한 스마트 캐스트
+    }
+    throw IllegalArgumentException("Unknown expression")
+}
+```
+
+코틀린에서는 is를 사용해 변수 타입을 검사한다. 자바의 instanceof랑 비슷하다.
+  
+하지만 자바에서는 instanceof로 확인한 다음에 그 타입에 속한 멤버에 접근하기 위해서는 명시적으롤 캐스팅한 결과를 저장한 후 사용해야한다.
+  
+코틀린에서는 프로그래머 대신 컴파일러가 원하는 타입으로 캐스팅하지 않아도 마치 처음부터 그 변수가 원하는 타입으로 선언된 것처럼 사용할 수 있다.
+  
+하지만 실제로는 컴파일러가 캐스팅을 수행해준다. 이를 `스마트 캐스트`라고 부른다.
+
+eval 함수에서 e의 타입이 Num인지 검사한 다음 부분에서 컴파일러는 e의 타입을 Num으로 해석한다. 
+
+그렇기에 Num의 프로퍼티인 value를 명시적 캐스팅 없이 e.value로 사용할 수 있다.
+  
+Sum의 프로퍼티인 right, left도 마찬가지다. 
+
+> 스마트 캐스트는 is로 변수에 든 값의 타입을 검사한 다음에 그 값이 바뀔 수 없는 경우에만 작동한다.  
+> 그렇기에 스마트캐스트를 사용한다면 그 프로퍼티는 반드시 val 이어야 하며 커스텀 접근자를 사용하는 것이어도 안 된다. (항상 같은 값을 리턴한다는 보장이 없기 때문이다)   
+> 원하는 타입으로 명시적을 타입캐스팅을 하려면 as 키워드를 사용한다.
+
+### 리팩토링: if를 when으로 변경
+
+이제 eval 함수를 더욱 코틀린스럽게 리팩터링해보겠다.
+
+```kt
+fun eval(e: Expr): Int =
+    if(e is Num) {
+        e.value
+    } else if (e is Sum) {
+        eval(e.right) + eval(e.left)
+    } else {
+        throw IllegalArugmentException("Unknown expression")
+    }
+
+```
+if의 분기에 식이 하나밖에 없다면 중괄호를 생략해도 된다.  
+if 분기에 블록을 사용하는 경우 그 블록의 마지막 식이 그 분기의 결과 값이다.
+
+이 코드를 when으로 더욱 다듬을 수도 있다.
+
+```kt
+fun eval(e: Expr): Int =
+    when(e) {
+        is Num -> e.value
+        is Sum -> eval(e.right) + eval(e.left)
+        else -> throw IllegalArgumentException("Unknown expression")
+    }
+```
+
+<br>
+
+### if와 when의 분기에서 블록 사용
+
+if나 when 모두 분기에 블록을 사용할 수 있다. 
+  
+그런 경우 블록의 마지막 문장이 블록 전체의 결과가 된다.
+  
+예제로 봤던 eval 함수에 로그를 추가하고 싶다면 각 분기를 블록으로 만들고 블록의 맨 마지막에 그 분기의 결과 값을 위치시키면 된다.
+
+```kt
+fun eval(e: Expr): Int =
+    when(e) {
+        is Num -> { 
+            println("num: ${e.value}")
+            e.value
+        }
+        is Sum -> { 
+            val left = evalWithLogging(e.left)
+            val right = evalWithLogging(e.right)
+            println("sum: $left + $right")
+            left + right
+        }
+        else -> throw IllegalArgumentException("Unknown expression")
+    }
+```
+
+이제 evalWithLogging 함수가 출력하는 로그를 보면 연산이 이뤄진 순서를 알 수 있다.
